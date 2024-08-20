@@ -1,1 +1,1 @@
-export {CoralogixTransactionSampler} from './coralogix-transaction-sampler';
+export {CoralogixTransactionSampler, coralogixTransactionSampler} from './coralogix-transaction-sampler';

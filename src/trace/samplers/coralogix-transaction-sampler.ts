@@ -26,9 +26,10 @@ interface Handler {
     name?: string,
 }
 
+const routes: RouteMapping[] = [];
+
 export class CoralogixTransactionSampler implements Sampler {
     private readonly baseSampler: Sampler;
-    private routes: RouteMapping[] = [];
 
     constructor(baseSampler?: Sampler) {
         if (baseSampler) {
@@ -43,7 +44,7 @@ export class CoralogixTransactionSampler implements Sampler {
 
 
     private _getPathFromRoutes(path: string): string | undefined {
-        return this.routes.find(route => route.regex.test(path))?.path;
+        return routes.find(route => route.regex.test(path))?.path;
     }
 
     private _buildTransactionNameFromExpressPath(path: string, spanName: string): string {
@@ -59,8 +60,6 @@ export class CoralogixTransactionSampler implements Sampler {
     }
 
     setExpressApp(app: express.Application): void {
-        const routes: RouteMapping[] = [];
-
         app._router.stack.forEach((middleware: Handler | ILayer) => {
             if (this._isMiddlewareILayer(middleware)) {
                 // routes registered directly on the app
@@ -84,8 +83,6 @@ export class CoralogixTransactionSampler implements Sampler {
                 });
             }
         });
-
-        this.routes = [...this.routes, ...routes];
     }
 
     shouldSample(context: Context, traceId: string, spanName: string, spanKind: SpanKind, attributes: Attributes, links: Link[]): SamplingResult {
@@ -97,6 +94,8 @@ export class CoralogixTransactionSampler implements Sampler {
             const path = this._getPathFromRoutes(httpTarget ?? '');
 
             const transactionName = path ? this._buildTransactionNameFromExpressPath(path, spanName) : spanName;
+
+            console.log({transactionName});
 
             const distributedTransaction = spanContext?.traceState?.get(CoralogixTraceState.DISTRIBUTED_TRANSACTION_IDENTIFIER) ?? transactionName;
 
@@ -131,3 +130,5 @@ export class CoralogixTransactionSampler implements Sampler {
         }
     }
 }
+
+export const coralogixTransactionSampler = new CoralogixTransactionSampler();

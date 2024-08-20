@@ -12,10 +12,9 @@
     "test:unit": "node --import tsx --test test/test.ts",
     "lint": "eslint . --ext .ts",
     "lint:fix": "npm run lint -- --fix",
-    "build": "tsup src/index.ts --format cjs,esm --clean --sourcemap --dts"
+    "build": "tsup src/index.ts  src/register.ts --format cjs,esm --clean --sourcemap --dts"
   },
   "dependencies": {
-    "@opentelemetry/api": "^1.7.0",
     "@opentelemetry/sdk-trace-base": "^1.18.1",
     "@opentelemetry/semantic-conventions": "^1.25.1"
   },
